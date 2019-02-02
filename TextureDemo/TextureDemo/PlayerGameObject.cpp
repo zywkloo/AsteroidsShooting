@@ -18,19 +18,19 @@ void PlayerGameObject::update(double deltaTime) {
 	scaleMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(0.5f, 0.4f, 1.0f));
 	// Checking for player input and changing velocity
 	if (glfwGetKey(Window::getWindow(), GLFW_KEY_W) == GLFW_PRESS) {
-		// change the status
+		// speed up
 		translationMatrix = glm::translate(translationMatrix, glm::vec3(0.0f, 0.0002f, 0.0f));
 	}
 	if (glfwGetKey(Window::getWindow(), GLFW_KEY_S) == GLFW_PRESS) {
-		// This is where you should change the velocity vector of the player
+		// slow down
 		translationMatrix = glm::translate(translationMatrix, glm::vec3(0.0f, 0.00005f, 0.0f));
 	}
 	if (glfwGetKey(Window::getWindow(), GLFW_KEY_D) == GLFW_PRESS) {
-		// This is where you should change the velocity vector of the player
+		//turn left
 		rotationMatrix = glm::rotate(rotationMatrix, 0.5f, glm::vec3(0.0f, 0.0f, 1.0f));
 	}
 	if (glfwGetKey(Window::getWindow(), GLFW_KEY_A) == GLFW_PRESS) {
-		// This is where you should change the velocity vector of the player
+	//turn right
 		rotationMatrix = glm::rotate(rotationMatrix, -0.5f, glm::vec3(0.0f, 0.0f, 1.0f));
 	}
 

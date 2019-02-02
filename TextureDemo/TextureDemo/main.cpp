@@ -31,6 +31,14 @@ GLuint tex[3];
 // Global game object info
 std::vector<GameObject*> gameObjects;
 
+/*---------------new attributes--------------------------- */
+//Global bullets num
+int maxBullets = 10;
+//Global shooting time interval
+double shootInterval = 2;
+int numFlyingBullets = 0;
+
+/*------------------------------------------ */
 
 // Create the geometry for a square (with two triangles)
 // Return the number of array elements that form the square
@@ -138,6 +146,7 @@ int main(void){
 
 
 		// Run the main loop
+		double lastShootTime = glfwGetTime();
 		double lastTime = glfwGetTime();
 		while (!glfwWindowShouldClose(window.getWindow())) {
 			// Clear background
@@ -147,6 +156,8 @@ int main(void){
 			double currentTime = glfwGetTime();
 			double deltaTime = currentTime - lastTime;
 			lastTime = currentTime;
+
+			
 
 			// Select proper shader program to use
 			shader.enable();
@@ -162,6 +173,7 @@ int main(void){
 			for (int i = 0; i < gameObjects.size(); i++) {
 				// Get the current object
 				GameObject* currentGameObject = gameObjects[i];
+
 
 				// Updates game objects
 				currentGameObject->update(deltaTime);
@@ -179,6 +191,17 @@ int main(void){
 				// Render game objects
 				currentGameObject->render(shader);
 			}
+
+
+			if (glfwGetKey(Window::getWindow(), GLFW_KEY_SPACE) == GLFW_PRESS
+				&& (currentTime - lastShootTime) > shootInterval
+				&&  numFlyingBullets < maxBullets
+				) {
+				gameObjects.push_back(new GameObject(gameObjects[0]->getPosition(), tex[2], size));
+				++numFlyingBullets;
+				lastShootTime = currentTime;
+			}
+
 
 			// Update other events like input handling
 			glfwPollEvents();
