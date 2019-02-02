@@ -10,7 +10,7 @@ GameObject::GameObject(glm::vec3 &entityPosition, GLuint entityTexture, GLint en
 	texture = entityTexture;
 	numElements = entityNumElements;
 	translationMatrix = glm::translate(glm::mat4(1.0f), position);
-	rotationMatrix = glm::rotate(glm::mat4(1.0f), 0.0f, glm::vec3(0.0f, 0.0f, 1.0f));
+	rotationMatrix = glm::mat4(1.0f);
 	scaleMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(0.2f, 0.4f, 1.0f));
 	velocity = glm::vec3(0.0f, 0.0f, 0.0f);
 }
@@ -31,7 +31,6 @@ void GameObject::render(Shader &shader) {
 
 	// Set the transformation matrix in the shader
 	// TODO: Multiply your new transformations to make the transformationMatrix
-	//glm::mat4 transformationMatrix = translationMatrix;
 	glm::mat4 renderMatrix = translationMatrix*rotationMatrix*scaleMatrix;
 	shader.setUniformMat4("transformationMatrix", renderMatrix);
 

@@ -14,7 +14,7 @@ PlayerGameObject::PlayerGameObject(glm::vec3 &entityPos, GLuint entityTexture, G
 void PlayerGameObject::update(double deltaTime) {
 
 	translationMatrix = glm::translate(translationMatrix,glm::vec3(0.0f, 0.0001f, 0.0f));
-	rotationMatrix = glm::rotate(glm::mat4(1.0f), 0.0f, glm::vec3(0.0f, 0.0f, 1.0f));
+	//rotationMatrix = glm::rotate(rotationMatrix, 0.0f, glm::vec3(0.0f, 0.0f, 1.0f));
 	scaleMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(0.5f, 0.4f, 1.0f));
 	// Checking for player input and changing velocity
 	if (glfwGetKey(Window::getWindow(), GLFW_KEY_W) == GLFW_PRESS) {
