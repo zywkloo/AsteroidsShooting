@@ -18,6 +18,12 @@ public:
 	// Renders the GameObject using a shader
 	void render(Shader &shader);
 
+	/*Game Obj type
+	0: player;
+	1: shield
+	2: asteroids
+	3: bulletts*/
+	GLuint type;
 
 	// Getters
 	inline glm::vec3& getPosition() { return position; }
@@ -26,8 +32,9 @@ public:
 	inline glm::mat4& getRotationMatrix() { return rotationMatrix; };
 	inline glm::mat4& getScaleMatrix() { return scaleMatrix; };
 	inline glm::mat4& getTranslationSelfMatrix() { return translationSelfMatrix; };
-
-
+	inline GLboolean& getVisable() { return isVisable; };
+	// save the iniangle
+	double angle = 0;
 	// Setters
 	inline void setPosition(glm::vec3& newPosition) { position = newPosition; }
 	inline void setVelocity(glm::vec3& newVelocity) { velocity = newVelocity; }
@@ -35,7 +42,7 @@ public:
 	inline void setRotationMatrix(glm::mat4 newRotationMatrix) { rotationMatrix = newRotationMatrix; };
 	inline void setScaleMatrix(glm::mat4 newScaleMatrix) { scaleMatrix = newScaleMatrix; };
 	inline void setTranslationSelfMatrix(glm::mat4 newTranslationSelfMatrix) { translationSelfMatrix = newTranslationSelfMatrix; };
-
+	inline void setVisable(GLboolean newVisable){isVisable = newVisable;};
 protected:
 	// Object's Transform Variables
 	// TODO: Add more transformation variables
@@ -45,13 +52,8 @@ protected:
 	glm::mat4 rotationMatrix;
 	glm::mat4 scaleMatrix;
 	glm::mat4 translationSelfMatrix;
-	/*type 
-	0: player;
-	1: shield
-	2: asteroids
-	3: bulletts
-	*/
-	GLuint type;
+	GLboolean isVisable;
+
 
 
 

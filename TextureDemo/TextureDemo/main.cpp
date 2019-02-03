@@ -1,3 +1,20 @@
+/*  Yiwei Zhang 101071022
+//
+Game Obj type:
+0: player;
+1: shield
+2: asteroids
+3: bulletts
+
+features:
+1\ship move
+2\
+//
+//
+problems: 
+1\bullet direction is not precise;
+2\
+*/
 #include <iostream>
 #include <stdexcept>
 #include <string>
@@ -34,10 +51,10 @@ std::vector<GameObject*> gameObjects;
 
 /*---------------new attributes--------------------------- */
 //Global bullets num
-int maxBullets = 10;
+const int maxBullets = 10;
 //Global shooting time interval
-double shootInterval = 0.1;
-int numFlyingBullets = 0;
+const double shootInterval = 0.1;
+
 
 /*------------------------------------------ */
 
@@ -143,14 +160,14 @@ int main(void){
 		gameObjects.push_back(new PlayerGameObject(glm::vec3(0.0f, 0.0f, 0.0f), tex[0], size,0));
 
 		// Setup asteroids
-		for (int i = 0; i <5; i++) {
+		for (int i = 0; i <100; i++) {
 			double randX = 5* (rand() / double(RAND_MAX)-0.5f);
-			double randY = 10 * (rand() / double(RAND_MAX))-1 ;
+			double randY = 20* (rand() / double(RAND_MAX))-1 ;
 			gameObjects.push_back(new GameObject(glm::vec3(randX, randY, 0.0f), tex[2], size, 2));
 		}
-		
+		// Setup rings
 		for (int i = 0; i < 10; i++) {
-			glm::vec3 offset = glm::vec3(0.8f*cos(360 / 9 * i), 0.8f*sin(360 / 9 * i),0.0f);
+			glm::vec3 offset = glm::vec3(0.5f*cos(360 / 9 * i), 0.5f*sin(360 / 9 * i),0.0f);
 			GameObject	*ringOrb = new GameObject(offset, tex[1], size, 1);
 			ringOrb->setTranslationSelfMatrix(glm::translate(glm::mat4(1.0f), offset));
 			gameObjects.push_back(ringOrb);
@@ -159,6 +176,12 @@ int main(void){
 		// Run the main loop
 		double lastShootTime = 0;
 		double lastTime = glfwGetTime();
+		//========================================
+		//defaulte zoom camera
+		float cameraZoom = 0.5f;
+		//current flyingBullets
+		int numFlyingBullets = 0;
+		//========================================
 		while (!glfwWindowShouldClose(window.getWindow())) {
 			// Clear background
 			window.clear(viewport_background_color_g);
@@ -170,12 +193,19 @@ int main(void){
 
 			
 
-			// Select proper shader program to use
+			// zoom in or out
 			shader.enable();
-
+			if (glfwGetKey(Window::getWindow(), GLFW_KEY_Z) == GLFW_PRESS) {
+				// zoom in
+				cameraZoom = (cameraZoom > 2) ? 2 : (cameraZoom + 0.1f*deltaTime);
+			}
+			else if (glfwGetKey(Window::getWindow(), GLFW_KEY_X) == GLFW_PRESS) {
+				//  zoom out
+				cameraZoom = (cameraZoom <0.3)? 0.3 : (cameraZoom -0.1f*deltaTime);
+			}
 			// Setup camera to focus on the player object (the first object in the gameObjects array)
 			glm::vec3 cameraTranslatePos(-gameObjects[0]->getPosition());
-			float cameraZoom = 0.5f;
+
 			glm::mat4 viewMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(cameraZoom, cameraZoom, cameraZoom)) * glm::translate(glm::mat4(1.0f), cameraTranslatePos);
 			shader.setUniformMat4("viewMatrix", viewMatrix);
 
@@ -185,23 +215,28 @@ int main(void){
 				// Get the current object
 				GameObject* currentGameObject = gameObjects[i];
 
+				if (currentGameObject->getVisable() == (GLboolean) true) {
+					// Updates game objects
+					currentGameObject->update(deltaTime);
 
+					// Check for collision between game objects
+					for (int j = i + 1; j < gameObjects.size(); j++) {
+						GameObject* otherGameObject = gameObjects[j];
+						float distance = glm::length(currentGameObject->getPosition() - otherGameObject->getPosition());
+						if (distance < 0.1f) {
+							// This is where you would perform collision response between objects
+							if (currentGameObject->type == 0) {
+								if (otherGameObject->type ==2 ) {
+									
+								}								
+							}
 
-				// Updates game objects
-				currentGameObject->update(deltaTime);
-
-				// Check for collision between game objects
-				for (int j = i + 1; j < gameObjects.size(); j++) {
-					GameObject* otherGameObject = gameObjects[j];
-
-					float distance = glm::length(currentGameObject->getPosition() - otherGameObject->getPosition());
-					if (distance < 0.1f) {
-						// This is where you would perform collision response between objects
+						}
 					}
-				}
 
-				// Render game objects
-				currentGameObject->render(shader);
+					// Render game objects
+					currentGameObject->render(shader);
+				}
 			}
 
 
@@ -209,10 +244,14 @@ int main(void){
 				&& ((currentTime - lastShootTime) > shootInterval)
 				&&  (numFlyingBullets < maxBullets)
 				) {
-				gameObjects.push_back(new GameObject(gameObjects[0]->getPosition(), tex[3], size,3));
+				GameObject *bullet = new GameObject(gameObjects[0]->getPosition(), tex[3], size, 3);
+				bullet->angle= gameObjects[0]->angle;
+				gameObjects.push_back(bullet);
 				numFlyingBullets++;
 				lastShootTime = currentTime;
 			}
+
+			
 
 
 			// Update other events like input handling
