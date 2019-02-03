@@ -23,7 +23,7 @@
 const std::string window_title_g = "Transform Demo";
 const unsigned int window_width_g = 800;
 const unsigned int window_height_g = 600;
-const glm::vec3 viewport_background_color_g(0.0, 0.0, 1.0);
+const glm::vec3 viewport_background_color_g(0.0, 0.0, 0.0);
 
 // Global texture info
 GLuint tex[3];
@@ -102,10 +102,11 @@ void setthisTexture(GLuint w, char *fname)
 void setallTexture(void)
 {
 //	tex = new GLuint[4];
-	glGenTextures(3, tex);
-	setthisTexture(tex[0], "orb.png");
+	glGenTextures(4, tex);
+	setthisTexture(tex[0], "Illidan.png");
 	setthisTexture(tex[1], "saw.png");
 	setthisTexture(tex[2], "rock.png");
+	setthisTexture(tex[3], "orb.png");
 
 	glBindTexture(GL_TEXTURE_2D, tex[0]);
 }
@@ -138,13 +139,28 @@ int main(void){
 		setallTexture();
 
 		// Setup the player object (position, texture, vertex count)
-		gameObjects.push_back(new PlayerGameObject(glm::vec3(0.0f, 0.0f, 0.0f), tex[0], size));
+		gameObjects.push_back(new PlayerGameObject(glm::vec3(0.0f, 0.0f, 0.0f), tex[0], size,0));
 
-		// Setup other objects
-		gameObjects.push_back(new GameObject(glm::vec3(-1.0f, 1.0f, 0.0f), tex[1], size));
-		gameObjects.push_back(new GameObject(glm::vec3(1.0f, -0.5f, 0.0f), tex[2], size));
+		// Setup asteroids
+		for (int i = 0; i < 20; i++) {
+			double randX = 5* (rand() / double(RAND_MAX)-0.5f);
+			double randY = 10 * (rand() / double(RAND_MAX))-1 ;
+			gameObjects.push_back(new GameObject(glm::vec3(randX, randY, 0.0f), tex[2], size, 2));
+		}
+		
+		for (int i = 0; i < 10; i++) {
+			glm::mat4 translationMatrix = glm::translate(glm::mat4(1.0f), gameObjects[0]->getPosition());
+			translationMatrix = glm::translate(translationMatrix, glm::vec3(0.8f, 0.0f, 0.0f));
+			glm::mat4 rotationMatrix = glm::rotate(translationMatrix, 0.5f*i, glm::vec3(0.0f, 0.0f, 1.0f));
+			glm::mat4 iniMat = rotationMatrix;// *translationMatrix;
+			glm::vec4 iniPos = (iniMat * glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
 
-
+			
+			GameObject	*ringOrb = new GameObject(glm::vec3(iniPos.x, iniPos.y, 1.0f), tex[1], size, 1);
+			ringOrb->setRotationMatrix(glm::rotate(glm::mat4(1.0f), 0.1f, glm::vec3(0.0f, 0.0f, 1.0f)));
+			gameObjects.push_back(ringOrb);
+		}
+		
 		// Run the main loop
 		double lastShootTime = glfwGetTime();
 		double lastTime = glfwGetTime();
@@ -197,7 +213,7 @@ int main(void){
 				&& (currentTime - lastShootTime) > shootInterval
 				&&  numFlyingBullets < maxBullets
 				) {
-				gameObjects.push_back(new GameObject(gameObjects[0]->getPosition(), tex[2], size));
+				gameObjects.push_back(new GameObject(gameObjects[0]->getPosition(), tex[1], size,1));
 				++numFlyingBullets;
 				lastShootTime = currentTime;
 			}

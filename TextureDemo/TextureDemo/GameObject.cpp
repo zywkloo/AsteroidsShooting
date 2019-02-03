@@ -5,19 +5,44 @@
 	The update method is virtual, so you can inherit from GameObject and override the update functionality (see PlayerGameObject for reference)
 */
 
-GameObject::GameObject(glm::vec3 &entityPosition, GLuint entityTexture, GLint entityNumElements) {
+GameObject::GameObject(glm::vec3 &entityPosition, GLuint entityTexture, GLint entityNumElements, GLint entityType) {
 	position = entityPosition;
 	texture = entityTexture;
 	numElements = entityNumElements;
 	translationMatrix = glm::translate(glm::mat4(1.0f), position);
-	rotationMatrix = glm::mat4(1.0f);
-	scaleMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(0.2f, 0.4f, 1.0f));
+	if (entityType == 2) {
+		objectSize=  0.3 * (rand() / double(RAND_MAX)) +0.3;
+		float objectRotation = 0.5 * (rand() / double(RAND_MAX)) + 0.5;
+		scaleMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(objectSize, objectSize, 1.0f));
+		rotationMatrix = glm::rotate(glm::mat4(1.0f), objectRotation, glm::vec3(0.0f, 0.0f, 1.0f));
+	}  else if (entityType == 1){
+		objectSize = 0.2;
+		scaleMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(objectSize, objectSize, 1.0f));
+		rotationMatrix = glm::mat4(1.0f);
+	} else { 
+		scaleMatrix = glm::mat4(1.0f); 
+		rotationMatrix = glm::mat4(1.0f);
+	}
+	translationSelfMatrix= glm::mat4(1.0f);
 	velocity = glm::vec3(0.0f, 0.0f, 0.0f);
+	type = entityType;
 }
 
 // Updates the GameObject's state. Can be overriden for children
 void GameObject::update(double deltaTime) {
 	// Update object position
+	if (type == 2) {
+		if (objectSize>0.45) {
+			rotationMatrix = glm::rotate(rotationMatrix, 0.02f, glm::vec3(0.0f, 0.0f, 1.0f));
+		}
+		else {
+			rotationMatrix = glm::rotate(rotationMatrix, 0.05f, glm::vec3(0.0f, 0.0f, 1.0f));
+		}
+	}
+	if (type == 1) {
+		rotationMatrix = glm::rotate(rotationMatrix, 0.5f, glm::vec3(0.0f, 0.0f, 1.0f));
+		translationMatrix = glm::translate(translationMatrix, glm::vec3(0.0f, 0.0f, 0.0f));
+	}
 	position += velocity * (float)deltaTime;
 }
 
@@ -28,10 +53,15 @@ void GameObject::render(Shader &shader) {
 
 	// Setup the transformation matrix for the shader
 	// TODO: Add different types of transformations
-
+	//if (type == 1) {};
 	// Set the transformation matrix in the shader
 	// TODO: Multiply your new transformations to make the transformationMatrix
-	glm::mat4 renderMatrix = translationMatrix*rotationMatrix*scaleMatrix;
+	glm::mat4 renderMatrix = glm::mat4(1.0f);
+	if (type == 1) {
+		renderMatrix = translationSelfMatrix * rotationMatrix* translationMatrix * scaleMatrix;
+	} else {
+		renderMatrix = translationMatrix * rotationMatrix*scaleMatrix;
+	}
 	shader.setUniformMat4("transformationMatrix", renderMatrix);
 
 	// Draw the entity

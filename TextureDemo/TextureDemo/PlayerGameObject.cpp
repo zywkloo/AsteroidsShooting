@@ -7,23 +7,25 @@
 	It overrides GameObject's update method, so that you can check for input to change the velocity of the player
 */
 
-PlayerGameObject::PlayerGameObject(glm::vec3 &entityPos, GLuint entityTexture, GLint entityNumElements)
-	: GameObject(entityPos, entityTexture, entityNumElements) {}
+PlayerGameObject::PlayerGameObject(glm::vec3 &entityPos, GLuint entityTexture, GLint entityNumElements, GLint entityType)
+	: GameObject(entityPos, entityTexture, entityNumElements, entityType) {}
 
 // Update function for moving the player object around
 void PlayerGameObject::update(double deltaTime) {
 
-	translationMatrix = glm::translate(translationMatrix,glm::vec3(0.0f, 0.0001f, 0.0f));
+	
 	//rotationMatrix = glm::rotate(rotationMatrix, 0.0f, glm::vec3(0.0f, 0.0f, 1.0f));
-	scaleMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(0.5f, 0.4f, 1.0f));
+	scaleMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(0.4f, 0.4f, 1.0f));
 	// Checking for player input and changing velocity
 	if (glfwGetKey(Window::getWindow(), GLFW_KEY_W) == GLFW_PRESS) {
 		// speed up
-		translationMatrix = glm::translate(translationMatrix, glm::vec3(0.0f, 0.0002f, 0.0f));
-	}
-	if (glfwGetKey(Window::getWindow(), GLFW_KEY_S) == GLFW_PRESS) {
-		// slow down
-		translationMatrix = glm::translate(translationMatrix, glm::vec3(0.0f, 0.00005f, 0.0f));
+		translationMatrix = glm::translate(translationMatrix, glm::vec3(0.0f, 0.001f, 0.0f));
+	} else if (glfwGetKey(Window::getWindow(), GLFW_KEY_S) == GLFW_PRESS) {
+		// speed down
+		translationMatrix = glm::translate(translationMatrix, glm::vec3(0.0f, 0.00008f, 0.0f));
+	} else {
+		//normal speed
+		translationMatrix = glm::translate(translationMatrix, glm::vec3(0.0f, 0.0002f, 0.0f)); 
 	}
 	if (glfwGetKey(Window::getWindow(), GLFW_KEY_D) == GLFW_PRESS) {
 		//turn left
@@ -37,6 +39,7 @@ void PlayerGameObject::update(double deltaTime) {
 	glm:: vec4 transformedPos = (translationMatrix * glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
 	position.x = transformedPos.x;
 	position.y = transformedPos.y;
+	//printf("  %f, %f", position.x, position.y);
 
 	// Call the parent's update method to move the object
 	GameObject::update(deltaTime);
