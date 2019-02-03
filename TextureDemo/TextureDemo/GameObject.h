@@ -41,11 +41,19 @@ protected:
 	// TODO: Add more transformation variables
 	glm::vec3 position;
 	glm::vec3 velocity;
-	glm::mat4 translationMatrix ;
+	glm::mat4 translationMatrix ;  
 	glm::mat4 rotationMatrix;
 	glm::mat4 scaleMatrix;
 	glm::mat4 translationSelfMatrix;
+	/*type 
+	0: player;
+	1: shield
+	2: asteroids
+	3: bulletts
+	*/
 	GLuint type;
+
+
 
 	// Object's details
 	GLint numElements;

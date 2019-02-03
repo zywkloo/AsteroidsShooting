@@ -10,6 +10,7 @@
 #include <SOIL/SOIL.h> // read image file
 #include <chrono>
 #include <thread>
+#include <math.h>
 
 #include "Shader.h"
 #include "Window.h"
@@ -35,7 +36,7 @@ std::vector<GameObject*> gameObjects;
 //Global bullets num
 int maxBullets = 10;
 //Global shooting time interval
-double shootInterval = 2;
+double shootInterval = 0.1;
 int numFlyingBullets = 0;
 
 /*------------------------------------------ */
@@ -142,27 +143,21 @@ int main(void){
 		gameObjects.push_back(new PlayerGameObject(glm::vec3(0.0f, 0.0f, 0.0f), tex[0], size,0));
 
 		// Setup asteroids
-		for (int i = 0; i < 20; i++) {
+		for (int i = 0; i <5; i++) {
 			double randX = 5* (rand() / double(RAND_MAX)-0.5f);
 			double randY = 10 * (rand() / double(RAND_MAX))-1 ;
 			gameObjects.push_back(new GameObject(glm::vec3(randX, randY, 0.0f), tex[2], size, 2));
 		}
 		
 		for (int i = 0; i < 10; i++) {
-			glm::mat4 translationMatrix = glm::translate(glm::mat4(1.0f), gameObjects[0]->getPosition());
-			translationMatrix = glm::translate(translationMatrix, glm::vec3(0.8f, 0.0f, 0.0f));
-			glm::mat4 rotationMatrix = glm::rotate(translationMatrix, 0.5f*i, glm::vec3(0.0f, 0.0f, 1.0f));
-			glm::mat4 iniMat = rotationMatrix;// *translationMatrix;
-			glm::vec4 iniPos = (iniMat * glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
-
-			
-			GameObject	*ringOrb = new GameObject(glm::vec3(iniPos.x, iniPos.y, 1.0f), tex[1], size, 1);
-			ringOrb->setRotationMatrix(glm::rotate(glm::mat4(1.0f), 0.1f, glm::vec3(0.0f, 0.0f, 1.0f)));
+			glm::vec3 offset = glm::vec3(0.8f*cos(360 / 9 * i), 0.8f*sin(360 / 9 * i),0.0f);
+			GameObject	*ringOrb = new GameObject(offset, tex[1], size, 1);
+			ringOrb->setTranslationSelfMatrix(glm::translate(glm::mat4(1.0f), offset));
 			gameObjects.push_back(ringOrb);
 		}
 		
 		// Run the main loop
-		double lastShootTime = glfwGetTime();
+		double lastShootTime = 0;
 		double lastTime = glfwGetTime();
 		while (!glfwWindowShouldClose(window.getWindow())) {
 			// Clear background
@@ -191,6 +186,7 @@ int main(void){
 				GameObject* currentGameObject = gameObjects[i];
 
 
+
 				// Updates game objects
 				currentGameObject->update(deltaTime);
 
@@ -210,11 +206,11 @@ int main(void){
 
 
 			if (glfwGetKey(Window::getWindow(), GLFW_KEY_SPACE) == GLFW_PRESS
-				&& (currentTime - lastShootTime) > shootInterval
-				&&  numFlyingBullets < maxBullets
+				&& ((currentTime - lastShootTime) > shootInterval)
+				&&  (numFlyingBullets < maxBullets)
 				) {
-				gameObjects.push_back(new GameObject(gameObjects[0]->getPosition(), tex[1], size,1));
-				++numFlyingBullets;
+				gameObjects.push_back(new GameObject(gameObjects[0]->getPosition(), tex[3], size,3));
+				numFlyingBullets++;
 				lastShootTime = currentTime;
 			}
 
