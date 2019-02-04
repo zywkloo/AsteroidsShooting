@@ -29,13 +29,13 @@ void PlayerGameObject::update(double deltaTime) {
 	}
 	if (glfwGetKey(Window::getWindow(), GLFW_KEY_D) == GLFW_PRESS) {
 		//turn left
-		rotationMatrix = glm::rotate(rotationMatrix, 0.5f, glm::vec3(0.0f, 0.0f, 1.0f));
-		angle += 0.5f;
+		rotationMatrix = glm::rotate(rotationMatrix, -0.5f, glm::vec3(0.0f, 0.0f, 1.0f));
+		angle -= 0.5f;
 	}
 	if (glfwGetKey(Window::getWindow(), GLFW_KEY_A) == GLFW_PRESS) {
 	//turn right
-		rotationMatrix = glm::rotate(rotationMatrix, -0.5f, glm::vec3(0.0f, 0.0f, 1.0f));
-		angle -= 0.5f;
+		rotationMatrix = glm::rotate(rotationMatrix, +0.5f, glm::vec3(0.0f, 0.0f, 1.0f));
+		angle += 0.5f;
 	}
 
 	glm:: vec4 transformedPos = (translationMatrix * glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));

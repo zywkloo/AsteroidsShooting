@@ -1,20 +1,20 @@
 /*  Yiwei Zhang 101071022
-//
 Game Obj type:
-0: player;
-1: shield
-2: asteroids
-3: bulletts
-
+	0: player;
+	1: shield
+	2: asteroids
+	3: bulletts
 features:
-1\ship move
-2\
-//
-//
+	1:ship move
+	2:fire
+	3:asteroids
+	4:zoomin zoomout
+	5:collision between bullets and targets
+	6:rings 
 problems: 
-1\bullet direction is not precise;
-2\
-*/
+	1:bullet direction is not precise;
+	2:rings not orbitting the ship
+	3:player and asteroid collision  undone   */
 #include <iostream>
 #include <stdexcept>
 #include <string>
@@ -161,8 +161,8 @@ int main(void){
 
 		// Setup asteroids
 		for (int i = 0; i <100; i++) {
-			double randX = 5* (rand() / double(RAND_MAX)-0.5f);
-			double randY = 20* (rand() / double(RAND_MAX))-1 ;
+			double randX = 7* (rand() / double(RAND_MAX)-0.5f);
+			double randY = 30* (rand() / double(RAND_MAX))-1 ;
 			gameObjects.push_back(new GameObject(glm::vec3(randX, randY, 0.0f), tex[2], size, 2));
 		}
 		// Setup rings
@@ -191,7 +191,7 @@ int main(void){
 			double deltaTime = currentTime - lastTime;
 			lastTime = currentTime;
 
-			
+
 
 			// zoom in or out
 			shader.enable();
@@ -201,7 +201,7 @@ int main(void){
 			}
 			else if (glfwGetKey(Window::getWindow(), GLFW_KEY_X) == GLFW_PRESS) {
 				//  zoom out
-				cameraZoom = (cameraZoom <0.3)? 0.3 : (cameraZoom -0.1f*deltaTime);
+				cameraZoom = (cameraZoom < 0.3) ? 0.3 : (cameraZoom - 0.1f*deltaTime);
 			}
 			// Setup camera to focus on the player object (the first object in the gameObjects array)
 			glm::vec3 cameraTranslatePos(-gameObjects[0]->getPosition());
@@ -215,7 +215,7 @@ int main(void){
 				// Get the current object
 				GameObject* currentGameObject = gameObjects[i];
 
-				if (currentGameObject->getVisable() == (GLboolean) true) {
+				if (currentGameObject->getVisable() == (GLboolean)true) {
 					// Updates game objects
 					currentGameObject->update(deltaTime);
 
@@ -223,34 +223,39 @@ int main(void){
 					for (int j = i + 1; j < gameObjects.size(); j++) {
 						GameObject* otherGameObject = gameObjects[j];
 						float distance = glm::length(currentGameObject->getPosition() - otherGameObject->getPosition());
-						if (distance < 0.1f) {
+						if (distance < currentGameObject->objectSize*0.8f) {
 							// This is where you would perform collision response between objects
-							if (currentGameObject->type == 0) {
-								if (otherGameObject->type ==2 ) {
-									
-								}								
+							if (currentGameObject->type == 2) {
+								if (otherGameObject->type == 3) {
+									currentGameObject->setVisable((GLfloat)false);
+									otherGameObject->setVisable((GLfloat)false);
+									numFlyingBullets--;
+
+								}
 							}
 
 						}
 					}
-
 					// Render game objects
 					currentGameObject->render(shader);
 				}
 			}
 
-
+			//press space to fire
 			if (glfwGetKey(Window::getWindow(), GLFW_KEY_SPACE) == GLFW_PRESS
 				&& ((currentTime - lastShootTime) > shootInterval)
-				&&  (numFlyingBullets < maxBullets)
+				&& (numFlyingBullets < maxBullets)
 				) {
 				GameObject *bullet = new GameObject(gameObjects[0]->getPosition(), tex[3], size, 3);
-				bullet->angle= gameObjects[0]->angle;
+				bullet->angle = gameObjects[0]->angle;
 				gameObjects.push_back(bullet);
 				numFlyingBullets++;
 				lastShootTime = currentTime;
 			}
-
+			//bullets recharged after a while
+			if (currentTime - lastShootTime > 10 * shootInterval){
+				numFlyingBullets -= numFlyingBullets;
+			}
 			
 
 
