@@ -3,7 +3,7 @@
 	0: player;
 	1: shield
 	2: asteroids
-	3: bulletts
+	3: bullets
 ## features:
 	1:ship move
 	2:fire
