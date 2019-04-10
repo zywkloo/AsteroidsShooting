@@ -11,7 +11,7 @@
 	4:zoomin zoomout
 	5:collision between bullets and targets
 	6:rings 
-## problems: 
+## Todo: 
 	1:bullet direction is not precise;
 	2:rings not orbitting the ship
 	3:player and asteroid collision  undone   
